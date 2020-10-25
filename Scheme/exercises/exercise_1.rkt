@@ -34,6 +34,7 @@
 ; Task 4 & 5:
 (define (palindrome? n)
   (= (reverse-int n)))
+
 (define (reverse-int n)
   (define (helper newN res)
     (if (= newN 0) res
@@ -70,8 +71,8 @@
           ((= 0 (remainder n i)) #f)
           ((> i (/ n 2)) #t)
           (else (helper (+ i 2) n))
-     )
-   )
+    )
+  )
   (helper 3 n)
 )
 
@@ -81,29 +82,38 @@
     (cond ((= n 0) #t)
           ((<= i (last-digit n)) #f)
           (else (helper (last-digit n) (quotient n 10)))
-     )
+    )
   )
   (helper (last-digit n) (quotient n 10))
 )
 
 ; Task 10
-; not working!
 (define (toBinary n)
-  (define (helper d newN)
-    (cond ((= newN 0) d)
-          (else (helper (* (+ d (remainder newN 2)) 10) (/ newN 2)))
-     )
-   )
-   (helper 1 n)
+  (if (= n 0)
+      0
+      (+ (remainder n 2) (* 10 (toBinary (quotient n 2)))))
+)
+
+; Task 10 - iterative
+(define (toBinary* n)
+  ; Invariant: pos, index of current bit of the resul
+  ; which we will get before n/2
+  (define (helper n res pos)
+    (if (= n 0) res
+        (helper (quotient n 2)
+                (+ res (* (remainder n 2) (expt 10 pos)))
+                (+ pos 1)))
+  )
+  (helper n 0 0)
 )
 
 ; Task 11
 (define (toDecimal n)
-  (define (helper res power n)
-    (cond ((= n 0) res)
-          ((= (last-digit n) 1) (helper (+ res (expt 2 power)) (+ power 1) (/ n 10)))
-          (else (helper res (+ power 1) (/ n 10)))
-     )
-   )
-  (helper 0 0 n)
+  (define (helper n pos)
+    (cond ((= n 0) 0)
+          ((= (remainder n 2) 1) (+ (expt 2 pos) (helper (quotient n 10) (+ pos 1))))
+          (else (helper (quotient n 10) (+ pos 1)))
+    )
+  )
+  (helper n 0)
 )
