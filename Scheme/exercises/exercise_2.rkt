@@ -20,12 +20,12 @@
   (helper n 0 0)
 )
    
-; Task 2 - #TO-DO:
+; Task 2:
 (define (toDecimal n)
   (define (helper n pos)
     (cond ((= n 0) 0)
-          ((= (remainder n 2) 1) (+ (expt 2 pos) (helper (/ n 10) (+ pos 1))))
-          (else (helper (/ n 10) (+ pos 1)))
+          ((= (remainder n 2) 1) (+ (expt 2 pos) (helper (quotient n 10) (+ pos 1))))
+          (else (helper (quotient n 10) (+ pos 1)))
     )
   )
   (helper n 0)
@@ -38,12 +38,10 @@
 ; Task 4:
 (define (flip f)
   (lambda (x y) (f y x)))
+
 ; Task 5:
-
-
-; Tricks:
-(define fma (lambda (x y z) (+ x (* y z)))) ; FMA
-;(define (fma x y z) (+ x (* y z)))
+(define (complement p?)
+  (lambda (x) (not (p? x))))
 
 ; Task 6:
 (define (compose f g)
