@@ -1,30 +1,87 @@
-; other stuff:
+#lang racket
+; Exercise N4
 
-; tuple:
-;(define p (cons 4 "some_string"))
-; (car p) -> 1st element
-; (cdr p) -> 2nd element
+(define head car) ; приема списък от "неща" и връща първото "нещо"
+(define tail cdr) ; приема списък от неща и връща също списък от нещата без първото
 
-; list:
+; Намира дължина на списък:
+(define (length lst)
+  (if (null? lst) 0
+      (+ 1 length (tail lst))))
 
-; empty list '()
+; Проверява дали елемента х се съдържа в списък:
+(define (member x lst)
+  (cond [(null? lst) #f] 
+        [(equal? (head lst) x) #t]  ; заб.: вградената member тук връща lst
+        [else (member x (tail lst))]))
 
-; 2 3 5 as a list:
-; cons
-; 2 cons
-;   3 cons
-;     5 '()
+; Task 1:
+; Взима първите n елемента на списък:
+(define (take n lst)
+  (if (or (= n 0) (null? lst))
+      '()
+      (cons (head lst)
+            (take (- n 1) (tail lst)))))
 
-(define l1 (cons 2 ( cons 3 (cons 5 '()))))
-(define l2 '(2 3 5))
-(define l3 (list (+ 2 0) 3 5))
+; Премахва първите n елемента на списък:
+(define (drop n lst)
+  (if (or (= n 0) (null? lst))
+      lst
+      (drop (- n 1) (tail lst))))
 
-;(define (length lst)
-;  (if (null? lst) 0
-;      (+ 1 (length (cdr lst)))))
+; Task 2:
+; Проверява дали предикатът е изпълнен за всеки елемент от списък:
+(define (all? p? lst)
+  (if (null? lst)
+      #t
+      (and (p? (head lst)) (all? p? (tail lst)))))
 
-(define head car)
-(define tail cdr)
+; Проверява дали предикатът е изпълнен за някой елемент от списък:
+(define (any? p? lst)
+  (if (null? lst)
+      #f
+      (or (p? (head lst)) (any? p? (tail lst)))))
+
+; Task 3:
+; Комплектова два по два елементите на два списъка:
+(define (zip lst1 lst2)
+  (if (or (null? lst1) (null? lst2))
+      '()
+      (cons (cons (head lst1)
+                  (head lst2))
+            (zip (tail lst1) (tail lst2)))))
+
+; Task 4:
+(define (zipWith f lst1 lst2)
+   (if (or (null? lst1) (null? lst2))
+       '()
+       (cons (f (head lst1) (head lst2))
+             (zipWith f (tail lst1) (tail lst2)))))
+
+(define (zip* lst1 lst2)
+  (zipWith cons lst1 lst2))
+
+; Task 5:
+; Проверява дали даден списък е сортиран
+(define (sorted? lst)
+  (or (null? lst)
+      (null? (tail lst))
+      (and (<= (head lst) (head (tail lst)))
+           (sorted? (tail lst)))))
+
+; Task 6:
+; Връща списък от уникалните елементи на даден списък:
+(define (uniques lst)
+  (define (helper lst res)
+    (cond [(null? lst) res]
+          [(member (head lst) res) (helper (tail lst) res)]
+          [else (helper (tail lst) (cons (head lst) res))])
+  )
+  (helper lst '())
+)
+
+; ------------
+; Side notes:
 
 ; Task 0:
 (define (member? x lst)
@@ -67,66 +124,6 @@
         (helper (tail lst) (+ res 1))))
   (helper lst 0)
   )
-
-; Task 1:
-(define (take n lst) ; reverse order
-  (define (helper n lst res)
-    (if (or (null? lst) (= n 0)) res
-         (helper (- n 1) (tail lst) (cons (head lst) res))))
-    (helper n lst '())
-  ) 
-; 2nd version:
-(define (take* n lst)
-  (if (or (= n 0) (null? lst))
-      '()
-      (cons (head lst)
-            (take* (- n 1) (tail lst)))))
-
-; Task 2:
-(define (drop n lst)
-  (if (or (= n 0) (null? lst))
-      lst
-      (drop (- n 1) (tail lst))))
-
-; Task 3:
-;(define (zip lst1 lst2)
-;  (if (or (null? lst1) (null? lst2))
-;      '()
-;      (cons (cons (head lst1) (head lst2))
-;            (zip (tail lst1) (tail lst2)))))
-
-; Task 4:
-(define (zipWith f lst1 lst2)
-  (if (or (null? lst1) (null? lst2))
-      '()
-      (cons (f (head lst1) (head lst2))
-            (zipWith f (tail lst1) (tail lst2)))))
-
-(define (zip lst1 lst2)
-  (zipWith cons lst1 lst2))
-
-; Task 5:
-(define (sorted? lst)
-  (if (or
-       (null? lst)
-       (null? (tail lst)))
-      #t
-      (and (<= (head lst) (head (tail lst)))
-           (sorted? (tail lst)))))
-
-; if we need length in function:
-(define (something lst)
-  (define (helper lst n) ; (length lst) = n
-    (...))
-  (helper lst (length lst)))
-
-
-
-
-
-
-
-
 
 
 

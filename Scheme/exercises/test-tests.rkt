@@ -1,5 +1,5 @@
 #lang racket
-
+(require rackunit "test.rkt")
 Arrange-Act-Assert
 (let ((r1 (cons-rational 1 2))
       (r2 (cons-rational 2 3)))
@@ -13,7 +13,7 @@ r2 -> 2/3
 result = r1 * r2
 
 
-(require rackunit "test.rkt")
+
 
 (test-suite
  "tests with selectors"
