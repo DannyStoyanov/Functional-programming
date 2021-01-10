@@ -24,7 +24,7 @@ fastPow x 1 = x
 fastPow x n
   | even n    = half*half
   | otherwise = half*half*x
-  where half = fastPow x (n `div` 2)
+  where half  = fastPow x (n `div` 2)
 
 -- Task 4:
 -- complAdd p1 p2 = (fst p1 + fst p2, snd p1 + snd p2)
