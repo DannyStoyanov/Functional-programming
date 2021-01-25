@@ -1,0 +1,13 @@
+(define (tree->treestring tree)
+  (define (helper lst res)
+    (cond [(null? lst) res]
+          [(number? (head lst)) (helper (tail lst) (string-append res (number->string (head lst))))]
+          [(list? (head lst)) (helper (tail lst) (string-append res " " (tree->treestring-wrapper (head lst))))]
+          [else (helper (tail lst) (string-append res " () "))]
+          )
+    )
+  (helper tree "")
+  )
+
+(define (tree->treestring-wrapper tree)
+  (string-append "(" (tree->treestring tree) ")"))

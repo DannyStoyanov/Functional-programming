@@ -99,7 +99,7 @@
 ; dropWhile, takeWhile, list-ref, zip, zipWith
 
 ; В стандартната реализация на racket
-; може да подадем няколко списък, но с
+; може да подадем няколко списъкa, но с
 ; еднаква дължина и map прилага операцията
 ; като върху първите елементи на всички
 ; списъци и така върху останалите
@@ -231,12 +231,12 @@
 (define (tree? t)
   (or (null? t)
       (and (list? t)
-           (= (length t) 3))
-      (tree? (cadr t))
-      (tree? (caddr t))))
+           (= (length t) 3)
+           (tree? (cadr t))
+           (tree? (caddr t)))))
 (define empty-tree '())
-(define (make-tree root left right) (list root left right))      ; не искаме просто (define make-tree list) - защо?
-(define (make-leaf root) (make-tree root empty-tree empty-tree)) ; за удобство
+(define (make-tree root left right) (list root left right))     
+(define (make-leaf root) (make-tree root empty-tree empty-tree)) 
 (define root-tree car)
 (define left-tree cadr)
 (define right-tree caddr)
@@ -244,14 +244,14 @@
 
 
 (define test-tree
-  (make-tree 10
-             (make-tree 7
-                        (make-leaf 10)
-                        (make-leaf 2))
-             (make-tree 3
-                        (make-tree 4
-                                   (make-leaf 1)
-                                   (make-leaf 2))
+  (make-tree 68
+             (make-tree 72
+                        (make-leaf 103)
+                        (make-leaf 206))
+             (make-tree 31
+                        (make-tree 45
+                                   (make-leaf 16)
+                                   (make-leaf 23))
                         empty-tree)))
 
 ; Task 4:
@@ -366,6 +366,105 @@
         [else (make-tree (root-tree tree)
                          (bloom (left-tree tree) val)
                          (bloom (right-tree tree) val))]))
+
+; -------------------------------
+(define (avr-val x y)
+  (/ (+ x y) 2))
+
+; Функция сравняваща елементите на дърво чрез операция op
+; (op трябва да е релация на частична наредба)
+(define (find-by tree op)
+  (cond [(is-leaf? tree) (root-tree tree)]
+        [(empty-tree? (left-tree tree)) (op (root-tree tree) (find-by (right-tree tree) op))]
+        [(empty-tree? (right-tree tree)) (op (root-tree tree) (find-by (left-tree tree) op))]
+        [else (op (root-tree tree)
+                  (find-by (left-tree tree) op)
+                  (find-by (right-tree tree) op))]))
+
+; Променя всеки връх със стойност from-val
+; към стойност to-val на дърво:
+(define (change-to-val tree from-val to-val)
+  (cond [(empty-tree? tree) empty-tree]
+        [(equal? (root-tree tree) from-val) (make-tree to-val
+                                             (change-to-val (left-tree tree) from-val to-val)
+                                             (change-to-val (right-tree tree) from-val to-val))]
+        [else (make-tree (root-tree tree)
+                         (change-to-val (left-tree tree) from-val to-val)
+                         (change-to-val (right-tree tree) from-val to-val))]))
+
+; List exercise:
+
+; 1. (len lst), която намира дължината на списък
+(define (len lst)
+  (if (null? lst)
+      0
+      (+ 1 (len (tail lst)))))
+
+; 2. (exists? lst p), която проверява дали съществува елемент в lst, за който е изпълнен предикатът p
+(define (exists? lst p?)
+  (cond [(null? lst) #f]
+        [(p? (head lst)) #t]
+        [else (exists? (tail lst) p?)]))
+
+; 3. (member? lst x), която проверява дали елементът x се съдържа в списъка lst (какво значи "съдържа"?)
+(define (member*? lst x)
+  (cond [(null? lst) #f]
+        [(equal? (head lst) x) #t]
+        [else (member*? (tail lst) x)]))
+
+; 4. (at n lst), която връща елементът, намиращ се на позиция n (броим от 0) в списъка lst или #f, ако позицията е извън списъка
+(define (at n lst)
+  (cond [(null? lst) #f]
+        [(= n 0) (head lst)]
+        [else (at (- n 1) (tail lst))]))
+
+; 5. (map f lst), която прилага f върху всеки елемент на списъка lst
+(define (map* f lst)
+  (if (null? lst)
+      '()
+      (cons (f (head lst))
+            (map* f (tail lst)))))
+
+; 6. (filter p lst), която съставя нов списък, съдържащ само елементите на lst, за които е изпълнен предикатът p
+(define (filter* p? lst)
+  (cond [(null? lst) '()]
+        [(p? (head lst)) (cons (head lst) (filter* p? (tail lst)))]
+        [else (filter* p? (tail lst))]))
+
+; 7. (push x lst), която добавя елемента x на края на списъка lst
+(define (push x lst)
+  (append lst (list x)))
+
+; 8. (reverse lst), която връща списък с елементите на lst в обратен ред
+(define (reverse*** lst)
+  (foldl cons '() lst))
+
+; 9. (insert x n lst), която вкарва елемента x на позиция
+;    n в списъка lst (ако n е след края на l, вкарваме x накрая)
+(define (insert x n lst)
+  (cond [(null? lst) '()]
+        [(and (null? lst) (not (= n 0))) (list x)]
+        [(= n 0) (cons x (insert x (- n 1) lst))]
+        [else (cons (head lst) (insert x (- n 1) (tail lst)))]))
+
+; 10. (accumulate l op init), която пресмята (op l[0] (op l[1] (op l[2] ... (op l[n] init) ... )))
+;     (ако имаме подаден празен списък, резултатът е init).
+(define (accumulate* lst op init)
+  (if (null? lst)
+      init
+      (op (head lst)
+          (accumulate* (tail lst) op init))))
+ 
+;----------------------------------------------
+
+
+
+
+
+
+
+
+  
 
 
 
